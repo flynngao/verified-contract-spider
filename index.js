@@ -47,7 +47,7 @@ const parseHtml = (html, chain) => {
 };
 
 const fetch = async () => {
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
   for (let chain in chainScaners) {
     console.log(`${chain} verifid Contracts data start fetching.`);
