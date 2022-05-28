@@ -1,6 +1,7 @@
 const superagent = require("superagent");
+const puppeteer = require("puppeteer");
+
 const cheerio = require("cheerio");
-const fs = require("fs");
 const mysql = require("mysql");
 const config = require("config");
 const dbConfig = config.get("dbConfig");
@@ -21,13 +22,13 @@ function sleep(ms) {
   });
 }
 
-const parseHtml = (res, chain) => {
-  let $ = cheerio.load(res.text);
+const parseHtml = (html, chain) => {
+  let $ = cheerio.load(html);
   $("tbody tr").each((idx, ele) => {
     let contract = {
-      address: $(ele).children("td:nth-child(1)").text(),
-      name: $(ele).children("td:nth-child(2)").text(),
-      Verified: $(ele).children("td:nth-child(8)").text(),
+      address: $(ele).children("td:nth-child(1)").text().trim(),
+      name: $(ele).children("td:nth-child(2)").text().trim(),
+      Verified: $(ele).children("td:nth-child(8)").text().trim(),
       chain,
     };
     var addSql = "INSERT INTO evm_contracts(name,chain,address) VALUES(?,?,?)";
@@ -46,12 +47,18 @@ const parseHtml = (res, chain) => {
 };
 
 const fetch = async () => {
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
   for (let chain in chainScaners) {
     console.log(`${chain} verifid Contracts data start fetching.`);
     for (let i = 1; i <= 5; ) {
       try {
-        const res = await superagent.get(chainScaners[chain](i));
-        parseHtml(res, chain);
+        // const res = await superagent.get(chainScaners[chain](i));
+        await page.goto(chainScaners[chain](i));
+        const html = await page.evaluate(() => {
+          return document.documentElement.innerHTML;
+        });
+        parseHtml(html, chain);
         await sleep(100);
         console.log(`${chain} ${i}00 verifid Contracts done.`);
         i++;
@@ -83,7 +90,9 @@ const main = () => {
     fetch();
   });
 };
-// main();
+main();
 
-const job = nodeCron.schedule("0 0 0 * * *", main.bind(null, false));
-console.log('Verifid Contracts fetch cronjob started. The Job will be actived at 00:00:00.')
+// const job = nodeCron.schedule("0 0 0 * * *", main.bind(null, false));
+// console.log(
+//   "Verifid Contracts fetch cronjob started. The Job will be actived at 00:00:00."
+// );
