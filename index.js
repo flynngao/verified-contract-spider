@@ -1,5 +1,5 @@
 const superagent = require("superagent");
-const puppeteer = require("puppeteer");
+// const puppeteer = require("puppeteer");
 
 const cheerio = require("cheerio");
 const mysql = require("mysql");
@@ -47,8 +47,8 @@ const parseHtml = (html, chain) => {
 };
 
 const fetch = async () => {
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
+  // const browser = await puppeteer.launch();
+  // const page = await browser.newPage();
   for (let chain in chainScaners) {
     console.log(`${chain} verifid Contracts data start fetching.`);
     for (let i = 1; i <= 5; ) {
@@ -83,6 +83,7 @@ const fetch = async () => {
           `Can\'t fetch https://etherscan.io/contractsVerified/${i}?ps=100`,
           error
         );
+        await sleep(1000);
       }
     }
     console.log(`${chain} all verifid Contracts done.`);
