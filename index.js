@@ -47,19 +47,35 @@ const parseHtml = (html, chain) => {
 };
 
 const fetch = async () => {
-  const browser = await puppeteer.launch({ headless: false });
+  const browser = await puppeteer.launch();
   const page = await browser.newPage();
   for (let chain in chainScaners) {
     console.log(`${chain} verifid Contracts data start fetching.`);
     for (let i = 1; i <= 5; ) {
       try {
-        // const res = await superagent.get(chainScaners[chain](i));
-        await page.goto(chainScaners[chain](i));
-        const html = await page.evaluate(() => {
-          return document.documentElement.innerHTML;
-        });
-        parseHtml(html, chain);
-        await sleep(100);
+        const res = await superagent
+
+          .get(chainScaners[chain](i))
+          .set(
+            "User-Agent",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.122 Safari/537.36 SE 2.X MetaSr 1.0"
+          )
+          .set(
+            "Accept",
+            "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
+          )
+          .set("Accept-Encoding", "gzip, deflate, br")
+          .set(
+            "Accept-Language",
+            "zh-CN,zh;q=0.9,en;q=0.8,ja;q=0.7,ko;q=0.6,zh-TW;q=0.5,fr;q=0.4,cy;q=0.3"
+          );
+        // await page.goto(chainScaners[chain](i));
+        // const html = await page.evaluate(() => {
+        //   return document.documentElement.innerHTML;
+        // });
+        // console.log(html)
+        parseHtml(res.text, chain);
+        await sleep(1000);
         console.log(`${chain} ${i}00 verifid Contracts done.`);
         i++;
       } catch (error) {
