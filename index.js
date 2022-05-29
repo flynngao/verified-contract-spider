@@ -53,8 +53,9 @@ const fetch = async () => {
       
       try {
         const res = await axios.get(chainScaners[chain](i), {
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.122 Safari/537.36 SE 2.X MetaSr 1.0",
+          headers:{
+            "User-Agent":
+            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.122 Safari/537.36 SE 2.X MetaSr 1.0"}
         });
         // .set(
         //   "Accept",
@@ -78,7 +79,7 @@ const fetch = async () => {
         i++;
       } catch (error) {
         console.error(
-          `Can\'t fetch https://etherscan.io/contractsVerified/${i}?ps=100`,
+          `Can\'t fetch ` + chainScaners[chain](i),
           error
         );
         await sleep(20000);
