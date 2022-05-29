@@ -9,6 +9,7 @@
   "author": "flynngao",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.27.2",
     "cheerio": "^1.0.0-rc.11",
     "config": "^3.3.7",
     "mysql": "^2.18.1",
