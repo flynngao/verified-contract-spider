@@ -16,11 +16,8 @@ const chainScaners = {
   BSC: (i) => `https://bscscan.com/contractsVerified/${i}?ps=100`,
   AVAX: (i) => `https://snowtrace.io/contractsVerified/${i}?ps=100`,
 };
-
 function sleep(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 const parseHtml = (html, chain) => {
@@ -53,6 +50,7 @@ const fetch = async () => {
   for (let chain in chainScaners) {
     console.log(`${chain} verifid Contracts data start fetching.`);
     for (let i = 1; i <= 5; ) {
+      
       try {
         const res = await axios.get(chainScaners[chain](i), {
           "User-Agent":
@@ -72,16 +70,18 @@ const fetch = async () => {
         //   return document.documentElement.innerHTML;
         // });
         // console.log(html)
+        
         parseHtml(res.data, chain);
-        await sleep(1000);
+        
         console.log(`${chain} ${i}00 verifid Contracts done.`);
+        await sleep(20000);
         i++;
       } catch (error) {
         console.error(
           `Can\'t fetch https://etherscan.io/contractsVerified/${i}?ps=100`,
           error
         );
-        await sleep(1000);
+        await sleep(20000);
       }
     }
     console.log(`${chain} all verifid Contracts done.`);
