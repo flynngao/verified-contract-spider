@@ -13,7 +13,7 @@ const connection = mysql.createConnection(dbConfig);
 const verifiedContracts = [];
 const chainScaners = {
   ETH: (i) => `https://etherscan.io/contractsVerified/${i}?ps=100`,
-  BSC: (i) => `https://bscscan.com/contractsVerified/${i}?ps=100`,
+  // BSC: (i) => `https://bscscan.com/contractsVerified/${i}?ps=100`,
   AVAX: (i) => `https://snowtrace.io/contractsVerified/${i}?ps=100`,
 };
 function sleep(ms) {
@@ -48,32 +48,19 @@ const fetch = async () => {
   // const browser = await puppeteer.launch();
   // const page = await browser.newPage();
   for (let chain in chainScaners) {
-    console.log(`${chain} verifid Contracts data start fetching.`);
+    
     for (let i = 1; i <= 5; ) {
       try {
+        console.log(`${chainScaners[chain](i)} verifid Contracts data start fetching.`);
         const res = await axios.get(chainScaners[chain](i), {
           headers: {
-            "User-Agent":
-              "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.122 Safari/537.36 SE 2.X MetaSr 1.0",
+            "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.122 Safari/537.36 SE 2.X MetaSr 1.0",
             Accept:
               "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-            "Accept-Encoding": "gzip, deflate, br",
             "Accept-Language":
               "zh-CN,zh;q=0.9,en;q=0.8,ja;q=0.7,ko;q=0.6,zh-TW;q=0.5,fr;q=0.4,cy;q=0.3",
           },
-        });
-        // .set(
-        //
-        // )
-        // .set()
-        // .set(
-        //
-        // );
-        // await page.goto(chainScaners[chain](i));
-        // const html = await page.evaluate(() => {
-        //   return document.documentElement.innerHTML;
-        // });
-        // console.log(html)
+        }); 
 
         parseHtml(res.data, chain);
 
@@ -106,9 +93,9 @@ const main = () => {
     fetch();
   });
 };
-main();
+// main();
 
-// const job = nodeCron.schedule("0 0 0 * * *", main.bind(null, false));
-// console.log(
-//   "Verifid Contracts fetch cronjob started. The Job will be actived at 00:00:00."
-// );
+const job = nodeCron.schedule("0 0 0 * * *", main.bind(null, false));
+console.log(
+  "Verifid Contracts fetch cronjob started. The Job will be actived at 00:00:00."
+);
