@@ -99,5 +99,5 @@ const main = () => {
 
 const job = nodeCron.schedule("0 0 0 * * *", main.bind(null, false));
 console.log(
-  new Date() + "- Verifid Contracts fetch cronjob started. The Job will be actived at 00:00:00."
+  new Date() + " - Verifid Contracts fetch cronjob started. The Job will be actived at 00:00:00."
 );
