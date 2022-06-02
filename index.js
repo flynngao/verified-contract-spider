@@ -86,12 +86,12 @@ const main = () => {
   ) {
     if (error) throw error;
     console.log(
-      "Connected Database, The count of contracts is:",
-      results[0]["Count(*)"], new Date()
+      new Date() + " - Connected Database, The count of contracts is:",
+      results[0]["Count(*)"]
     );
     fetch();
     connection.end(() => {
-      console.log('Disconnected Database.', new Date());
+      console.log(new Date() + ' - Disconnected Database.');  
     });
   });
 };
@@ -99,5 +99,5 @@ const main = () => {
 
 const job = nodeCron.schedule("0 0 0 * * *", main.bind(null, false));
 console.log(
-  "Verifid Contracts fetch cronjob started. The Job will be actived at 00:00:00."
+  new Date() + "- Verifid Contracts fetch cronjob started. The Job will be actived at 00:00:00."
 );
