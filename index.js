@@ -8,7 +8,7 @@ const config = require("config");
 const dbConfig = config.get("dbConfig");
 const nodeCron = require("node-cron");
 
-const connection = mysql.createConnection(dbConfig);
+const pool = mysql.createPool(dbConfig);
 
 const verifiedContracts = [];
 const chainScaners = {
@@ -31,14 +31,15 @@ const parseHtml = (html, chain) => {
     };
     var addSql = "INSERT INTO evm_contracts(name,chain,address) VALUES(?,?,?)";
     var addSqlParams = [contract.name, contract.chain, contract.address];
-    //增
-    connection.query(addSql, addSqlParams, function (err, result) {
-      if (err) {
-        console.error("[INSERT ERROR] - ", err.message);
-        return;
-      }
-      console.log("INSERT ID:", result.insertId);
-      // console.log("INSERT ID:", result);
+    pool.getConnection((err, connection) => {
+      connection.query(addSql, addSqlParams, (err, result) => {
+        if (err) {
+          console.error("[INSERT ERROR] - ", err.message);
+          return;
+        }
+        console.log("INSERT ID:", result.insertId);
+        // console.log("INSERT ID:", result);
+      });
     });
     // verifiedContracts.push(contract);
   });
@@ -48,19 +49,21 @@ const fetch = async () => {
   // const browser = await puppeteer.launch();
   // const page = await browser.newPage();
   for (let chain in chainScaners) {
-    
     for (let i = 1; i <= 5; ) {
       try {
-        console.log(`${chainScaners[chain](i)} verifid Contracts data start fetching.`);
+        console.log(
+          `${chainScaners[chain](i)} verifid Contracts data start fetching.`
+        );
         const res = await axios.get(chainScaners[chain](i), {
           headers: {
-            "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.122 Safari/537.36 SE 2.X MetaSr 1.0",
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.122 Safari/537.36 SE 2.X MetaSr 1.0",
             Accept:
               "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
             "Accept-Language":
               "zh-CN,zh;q=0.9,en;q=0.8,ja;q=0.7,ko;q=0.6,zh-TW;q=0.5,fr;q=0.4,cy;q=0.3",
           },
-        }); 
+        });
 
         parseHtml(res.data, chain);
 
@@ -79,19 +82,19 @@ const fetch = async () => {
 };
 
 const main = () => {
-  connection.connect();
-  connection.query("SELECT Count(*) from evm_contracts", function (
-    error,
-    results
-  ) {
-    if (error) throw error;
-    console.log(
-      new Date() + " - Connected Database, The count of contracts is:",
-      results[0]["Count(*)"]
-    );
-    fetch();
-    connection.end(() => {
-      console.log(new Date() + ' - Disconnected Database.');  
+  pool.getConnection((err, connection) => {
+    connection.query("SELECT Count(*) from evm_contracts", function (
+      error,
+      results
+    ) {
+      if (error) throw error;
+      console.log(
+        new Date() + " - Connected Database, The count of contracts is:",
+        results[0]["Count(*)"]
+      );
+
+      connection.release();
+      fetch();
     });
   });
 };
