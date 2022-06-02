@@ -80,7 +80,6 @@ const fetch = async () => {
 
 const main = () => {
   connection.connect();
-
   connection.query("SELECT Count(*) from evm_contracts", function (
     error,
     results
@@ -88,9 +87,12 @@ const main = () => {
     if (error) throw error;
     console.log(
       "Connected Database, The count of contracts is:",
-      results[0]["Count(*)"]
+      results[0]["Count(*)"], new Date()
     );
     fetch();
+    connection.end(() => {
+      console.log('Disconnected Database.', new Date());
+    });
   });
 };
 // main();
