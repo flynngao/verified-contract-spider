@@ -40,6 +40,7 @@ const parseHtml = (html, chain) => {
         console.log("INSERT ID:", result.insertId);
         // console.log("INSERT ID:", result);
       });
+      connection.release();
     });
     // verifiedContracts.push(contract);
   });
