@@ -78,7 +78,6 @@ const fetch = async () => {
     console.log(`${chain} all verifid Contracts done.`);
   }
   console.log(`Counts of Contracts ${verifiedContracts.length}`);
-  connection.end();
 };
 
 const main = () => {
